@@ -1,0 +1,144 @@
+1. Input/Output:
+
+1.1 Blocking I/O (synchronously)
+    ```
+        const connection = db.connect(); // connect to the database
+        const users = connection.query("SELECT * FROM users"); // make a query
+        console.log(users); // display information in the console
+    ```
+- When you need to get data without which the program cannot start. For example, information about settings
+- It can be used in console applications with only one user
+
+1.2. Non-blocking I/O (asynchronously)
+
+    ```
+        db.connect((error, connection) => {
+            if (error) throw error;
+            connection.query("SELECT * FROM users", (users) => {
+                console.log(users);
+            });
+        });
+    ```
+
+For input and output operations (I/O) in Node.js, there are standard input and output streams:
+
+2. Standard Input/Output Streams
+
+    process.stdin - input stream
+    process.stdout - output stream
+    process.stderr - error stream as a variation of the output stream
+    // console.log() for outputting information uses process.stdout.
+
+    process.exit(); <- stop execution
+
+example1:
+    ```
+        const { stdin, stdout } = process;
+
+        stdout.write("What is your name?\n");
+        stdin.on("data", (data) => {
+        stdout.write("Hello, ");
+        stdout.write(data);
+        process.exit();
+        });
+        process.on("exit", () => stdout.write("Goodbye!"));
+    ```
+
+example2:
+    ```
+        const { stdin, stdout } = process;
+
+        stdout.write("What is your name?\n");
+        stdin.on("data", (data) => {
+        const name = data.toString();
+        const reverseName = name.split("").reverse().join("");
+        stdout.write(`\nYour name in reverse is ${reverseName}`);
+        process.exit();
+        });
+    ```
+
+3. Command Line Arguments
+
+In Node.js, file run with specific command line arguments. 
+When running a file, the arguments are passed after its name.
+    >> node test 1 2 3
+    // 1, 2, 3 are the arguments.
+    console.log(process.argv);
+
+3.1. Flags
+example1: 
+    ```
+        const flagIndex = process.argv.indexOf("-m");
+        if (flagIndex !== -1) {
+        const message = process.argv[flagIndex + 1];
+        console.log(message);
+        }
+    ```
+
+example2: 
+    ```
+        function getValue(flag) {
+        const flagIndex = process.argv.indexOf(flag);
+        return flagIndex !== -1 ? process.argv[flagIndex + 1] : null;
+        }
+        const message = getValue("-m");
+        console.log(message);
+    ```
+
+3.2. CLI Options
+
+    ```
+        const { stdout, stdin, exit } = process;
+        const flag = process.argv[2];
+        const allowedFlags = ["-m", "-s"];
+        if (!allowedFlags.includes(flag)) {
+        stdout.write("Try running the file again with the -s or -m flag");
+        exit();
+        }
+        stdout.write("Please enter two numbers\n");
+        stdin.on("data", (data) => {
+        const numString = data.toString();
+        const numStringsArray = numString.split(" ");
+        const hasIncorrectLength = numStringsArray.length !== 2;
+        const hasIncorrectValues = numStringsArray.some((numStr) =>
+            Number.isNaN(+numStr),
+        );
+        if (hasIncorrectLength || hasIncorrectValues) {
+            stdout.write("You need to enter 2 numbers separated by a space");
+            exit();
+        }
+        const [firstNum, secondNum] = numStringsArray.map((numStr) => +numStr);
+        if (flag === "-s") {
+            const sum = firstNum + secondNum;
+            stdout.write(`${firstNum} + ${secondNum} = ${sum}`);
+        } else {
+            const mult = firstNum * secondNum;
+            stdout.write(`${firstNum} * ${secondNum} = ${mult}`);
+        }
+        exit();
+        });
+    ```
+
+
+4. File System Access
+
+console.log(__dirname); // __dirname is the full path to the dir
+console.log(__filename); // __filename is the full path + filename 
+
+5. Modules
+
+Node.js treats any file as a module.
+To include a module, the require() function is used.
+
+Examples of module inclusion:
+   >> const path = require("path");
+   >> const fs = require("fs");
+   >> const os = require("os");
+
+Install the nodemon module. To do this, execute the command in the terminal:
+   >> npm install nodemon
+Removing a module:
+   >> npm uninstall nodemon
+
+path module: const path = require('path');
+file system module: const fs = require('fs');
