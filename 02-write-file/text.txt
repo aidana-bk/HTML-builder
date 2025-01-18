@@ -1,0 +1,8 @@
+start
+check the text to be written
+check that work properly
+stop
+exit 1
+should rewrite? 
+why not added final text?
+stop!
