@@ -3,7 +3,7 @@ const path = require('path');
 
 const stylesDir = path.join(__dirname, 'styles');
 const outputDir = path.join(__dirname, 'project-dist');
-// const finalFile = path.join(outputDir, 'bundle.css');
+const finalFile = path.join(outputDir, 'bundle.css');
 
 async function mergeStyle() {
   const styleContent = [];
@@ -29,10 +29,12 @@ async function mergeStyle() {
         console.error('Error reading file:', err.message);
       }
     }
-    console.log(styleContent);
+    // console.log(styleContent);
   } catch (error) {
     console.log('error occured while styles merge process: ', error);
   }
+  const bundleContent = styleContent.join('\n');
+  await fs.writeFile(finalFile, bundleContent, 'utf8');
 }
 
 mergeStyle();
