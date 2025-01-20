@@ -40,13 +40,13 @@ async function buildTemplate() {
           componentContent +
           template.slice(endIdx + 2);
       } catch (error) {
-        console.error('Error reading component:', error.message);
+        console.log('Error reading component:', error.message);
       }
       startIdx = template.indexOf('{{');
     }
     await fs.writeFile(path.join(outputDir, 'index.html'), template, 'utf8');
   } catch (error) {
-    console.error('Error creating template:', error.message);
+    console.log('Error creating template:', error.message);
   }
 }
 
@@ -71,7 +71,7 @@ async function buildStyle() {
       'utf8',
     );
   } catch (error) {
-    console.error('Error creating style:', error.message);
+    console.log('Error creating style:', error.message);
   }
 }
 
@@ -79,19 +79,23 @@ async function copyAssets() {
   try {
     const sourceDir = path.join(__dirname, 'assets');
     const targetDir = path.join(__dirname, 'project-dist', 'assets');
-    await fs.mkdir(targetDir, { recursive: true });
-    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-    for (const elem of entries) {
-      const sourcePath = path.join(sourceDir, elem.name);
-      const targetPath = path.join(targetDir, elem.name);
-      if (elem.isDirectory()) {
-        await copyAssets(sourcePath, targetPath);
-      } else {
-        await fs.copyFile(sourcePath, targetPath);
-      }
-    }
+    await copyDirectory(sourceDir, targetDir);
   } catch (error) {
-    throw new Error('Assets copying failed: ', error.message);
+    console.log('Assets copying failed: ', error.message);
+  }
+}
+
+async function copyDirectory(sourceDir, targetDir) {
+  await fs.mkdir(targetDir, { recursive: true });
+  const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+  for (const elem of entries) {
+    const sourcePath = path.join(sourceDir, elem.name);
+    const targetPath = path.join(targetDir, elem.name);
+    if (elem.isDirectory()) {
+      await copyDirectory(sourcePath, targetPath);
+    } else {
+      await fs.copyFile(sourcePath, targetPath);
+    }
   }
 }
 
