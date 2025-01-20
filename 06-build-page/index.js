@@ -8,6 +8,7 @@ async function buildPage() {
     });
     await buildTemplate();
     await buildStyle();
+    await copyAssets();
   } catch (error) {
     console.error('Error: ', error);
     process.exit(1);
@@ -71,6 +72,26 @@ async function buildStyle() {
     );
   } catch (error) {
     console.error('Error creating style:', error.message);
+  }
+}
+
+async function copyAssets() {
+  try {
+    const sourceDir = path.join(__dirname, 'assets');
+    const targetDir = path.join(__dirname, 'project-dist', 'assets');
+    await fs.mkdir(targetDir, { recursive: true });
+    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+    for (const elem of entries) {
+      const sourcePath = path.join(sourceDir, elem.name);
+      const targetPath = path.join(targetDir, elem.name);
+      if (elem.isDirectory()) {
+        await copyAssets(sourcePath, targetPath);
+      } else {
+        await fs.copyFile(sourcePath, targetPath);
+      }
+    }
+  } catch (error) {
+    throw new Error('Assets copying failed: ', error.message);
   }
 }
 
