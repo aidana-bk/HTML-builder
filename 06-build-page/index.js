@@ -7,6 +7,7 @@ async function buildPage() {
       recursive: true,
     });
     await buildTemplate();
+    await buildStyle();
   } catch (error) {
     console.error('Error: ', error);
     process.exit(1);
@@ -45,6 +46,31 @@ async function buildTemplate() {
     await fs.writeFile(path.join(outputDir, 'index.html'), template, 'utf8');
   } catch (error) {
     console.error('Error creating template:', error.message);
+  }
+}
+
+async function buildStyle() {
+  try {
+    const styleFiles = await fs.readdir(path.join(__dirname, 'styles'));
+    const styleContents = [];
+
+    for (const file of styleFiles) {
+      if (path.extname(file) === '.css') {
+        const content = await fs.readFile(
+          path.join(__dirname, 'styles', file),
+          'utf8',
+        );
+        styleContents.push(content);
+      }
+    }
+
+    await fs.writeFile(
+      path.join(__dirname, 'project-dist', 'style.css'),
+      styleContents.join('\n'),
+      'utf8',
+    );
+  } catch (error) {
+    console.error('Error creating style:', error.message);
   }
 }
 
